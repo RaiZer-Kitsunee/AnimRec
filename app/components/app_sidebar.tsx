@@ -33,7 +33,7 @@ const items = [
 export function AppSidebar() {
   return (
     <Sidebar>
-      <SidebarContent className="bg-gray-200! justify-center">
+      <SidebarContent className="bg-gray-950! border-r border-gray-800 justify-center">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -41,7 +41,7 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild className="z-11">
                     <Link href={item.url}>
-                      <item.icon className="size-5!" />
+                      <item.icon className="size-5! text-white" />
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

@@ -8,14 +8,14 @@ import {
 
 const STATIC_DATA = `{ id title { romaji english native } description source season seasonYear genres episodes status format duration averageScore popularity favourites 
    studios(isMain: true) { nodes { name id } } nextAiringEpisode { airingAt timeUntilAiring episode } 
-   relations { edges { relationType node { id title { romaji } coverImage { extraLarge large medium } format } } } coverImage { extraLarge large medium } 
+   characters { edges { role  node {  id name { full } image { large }  }  } } relations { edges { relationType node { id title { romaji } coverImage { extraLarge large medium } format } } } coverImage { extraLarge large medium } 
    bannerImage } }`;
 
-const QUERY = `query ($id: Int) { Media(id: $id, type: ANIME) ${STATIC_DATA} }`;
+const QUERY = `query ($id: Int) { Media(id: $id, type: ANIME) ${STATIC_DATA} `;
 
 const QUERY_ALL = `query ($page: Int, $perPage: Int) { Page(page: $page, perPage: $perPage) { media(type: ANIME) ${STATIC_DATA} }`;
 
-const QUERY_SEARCH = `query ($search: String) { Page(perPage: 10) { media(search: $search, type: ANIME) ${STATIC_DATA} }`;
+const QUERY_SEARCH = `query ($search: String) { Page(perPage: 20) { media(search: $search, type: ANIME) ${STATIC_DATA} }`;
 
 const QUERY_FILTER = `query ($genre: String, $year: Int) { Page(perPage: 50) { media(type: ANIME genre_in: [$genre] seasonYear: $year) ${STATIC_DATA} }`;
 

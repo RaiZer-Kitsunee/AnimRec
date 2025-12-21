@@ -16,6 +16,7 @@ interface Media {
   favourites: number;
   studios: MediaStudios;
   nextAiringEpisode: any | null;
+  characters: MediaCharacters;
   relations: MediaRelations;
   coverImage: MediaCoverImage;
   bannerImage: string | null;

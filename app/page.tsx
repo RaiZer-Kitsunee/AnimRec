@@ -12,8 +12,6 @@ export default function Home() {
     setLoading(true);
     try {
       const response = await fetchSortedAnimeDataList("POPULARITY_DESC");
-      console.log("all anime list");
-      console.log(response.data);
       if (response.success) {
         setAnimeData(response.data);
       }
@@ -36,7 +34,7 @@ export default function Home() {
         </div>
       )}
       {animeData && (
-        <div className="w-full grid grid-cols-7 gap-4">
+        <div className="w-full grid grid-cols-7 gap-4 z-10">
           {animeData.map((item, index) => {
             return AnimeItem({ index, data: item });
           })}
