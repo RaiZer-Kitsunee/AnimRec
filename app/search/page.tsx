@@ -2,7 +2,7 @@
 import { fetchSearchAnimeDataList } from "@/Service/fetch_data";
 import { SearchIcon, SparklesIcon, UserRoundSearch } from "lucide-react";
 import { useEffect, useState } from "react";
-import AnimeItem from "../components/anime_Item";
+import AnimeItem from "../../components/custom/anime_Item";
 
 export default function Search() {
   const [value, setValue] = useState("");

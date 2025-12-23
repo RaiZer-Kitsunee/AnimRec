@@ -1,4 +1,6 @@
 "use client";
+import CharacterItem from "@/components/custom/character_item";
+import RelationItem from "@/components/custom/relation_item";
 import { fetchOneAnimeData } from "@/Service/fetch_data";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -7,6 +9,7 @@ export default function AnimePage() {
   const [fetchedAnime, setFetchedAnime] = useState<Media | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
   const [isInList, setIsInList] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
@@ -19,7 +22,9 @@ export default function AnimePage() {
     setError(null);
     try {
       const response = await fetchOneAnimeData({ anime_id: animeId });
-      setFetchedAnime(response.data);
+      if (response.success) {
+        setFetchedAnime(response.data);
+      }
     } catch (err) {
       console.error("Error fetching anime:", err);
       setError("Failed to load anime data");
@@ -86,7 +91,7 @@ export default function AnimePage() {
             {/* Cover Image */}
             <div className="relative shrink-0 transform translate-y-12">
               <img
-                src={fetchedAnime.coverImage.extraLarge}
+                src={fetchedAnime?.coverImage.extraLarge}
                 alt={fetchedAnime.title.english || fetchedAnime.title.romaji}
                 className="w-48 h-72 object-cover rounded-lg shadow-2xl"
               />
@@ -170,7 +175,7 @@ export default function AnimePage() {
               </div>
             </div>
             {/* Stats */}
-            <div className="shrink-0 pb-4">
+            <div className="shrink-0 pb-4 ">
               <div className="bg-gray-900/80 backdrop-blur rounded-lg p-4 space-y-3">
                 <div className="flex items-center gap-2">
                   <svg
@@ -247,26 +252,7 @@ export default function AnimePage() {
                     <div className="grid grid-cols-2 gap-4">
                       {fetchedAnime.characters.edges
                         .slice(0, 6)
-                        .map((char, idx) => (
-                          <div
-                            key={idx}
-                            className="flex gap-3 bg-gray-900 rounded-lg p-3 hover:bg-gray-800 transition-colors cursor-pointer"
-                          >
-                            <img
-                              src={char.node.image.large}
-                              alt={char.node.name.full}
-                              className="w-16 h-16 object-cover rounded"
-                            />
-                            <div>
-                              <div className="font-medium">
-                                {char.node.name.full}
-                              </div>
-                              <div className="text-sm text-gray-400">
-                                {char.role}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
+                        .map((char, idx) => CharacterItem({ idx, char }))}
                     </div>
                   </div>
                 )}
@@ -276,26 +262,16 @@ export default function AnimePage() {
                   <div>
                     <h2 className="text-xl font-semibold mb-4">Relations</h2>
                     <div className="flex gap-4 overflow-x-auto pb-2">
-                      {fetchedAnime.relations.edges.map((rel, idx) => (
-                        <div
-                          key={idx}
-                          className="bg-gray-900 rounded-lg overflow-hidden hover:bg-gray-800 transition-colors cursor-pointer flex-shrink-0"
-                        >
-                          <img
-                            src={rel.node.coverImage.large}
-                            alt={rel.node.title.romaji}
-                            className="w-32 h-48 object-cover"
-                          />
-                          <div className="p-3 w-32">
-                            <div className="text-xs text-blue-400 mb-1">
-                              {rel.relationType}
-                            </div>
-                            <div className="text-sm font-medium line-clamp-2">
-                              {rel.node.title.romaji}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
+                      {fetchedAnime.relations.edges.map((rel, idx) =>
+                        rel.relationType === "ADAPTATION" ||
+                        rel.relationType === "PARENT" ||
+                        rel.relationType === "ALTERNATIVE" ? (
+                          <></>
+                        ) : (
+                          (console.log("relations" + rel.relationType),
+                          RelationItem({ idx, rel }))
+                        )
+                      )}
                     </div>
                   </div>
                 )}
@@ -306,22 +282,9 @@ export default function AnimePage() {
               <div>
                 <h2 className="text-xl font-semibold mb-4">All Characters</h2>
                 <div className="grid grid-cols-2 gap-4">
-                  {fetchedAnime.characters.edges.map((char, idx) => (
-                    <div
-                      key={idx}
-                      className="flex gap-3 bg-gray-900 rounded-lg p-3 hover:bg-gray-800 transition-colors cursor-pointer"
-                    >
-                      <img
-                        src={char.node.image.large}
-                        alt={char.node.name.full}
-                        className="w-16 h-16 object-cover rounded"
-                      />
-                      <div>
-                        <div className="font-medium">{char.node.name.full}</div>
-                        <div className="text-sm text-gray-400">{char.role}</div>
-                      </div>
-                    </div>
-                  ))}
+                  {fetchedAnime.characters.edges.map((char, idx) =>
+                    CharacterItem({ idx, char })
+                  )}
                 </div>
               </div>
             )}

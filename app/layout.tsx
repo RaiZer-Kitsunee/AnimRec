@@ -8,6 +8,7 @@ import {
   SidebarTrigger,
 } from "@/components/animate-ui/components/radix/sidebar";
 import { AppSidebar } from "./components/app_sidebar";
+import { AnimeMediaProvider } from "@/contexts/anime_context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,13 +35,15 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-y-hidden`}
       >
-        <SidebarProvider>
-          <main>
-            <CustomTitleBar />
-            <AppSidebar />
-            {children}
-          </main>
-        </SidebarProvider>
+        <AnimeMediaProvider>
+          <SidebarProvider>
+            <main>
+              <CustomTitleBar />
+              <AppSidebar />
+              {children}
+            </main>
+          </SidebarProvider>
+        </AnimeMediaProvider>
       </body>
     </html>
   );
