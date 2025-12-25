@@ -1,7 +1,6 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import Image from "next/image";
 
 type ImagePreviewProps = {
   url: string;

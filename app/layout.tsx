@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import CustomTitleBar from "./components/controller";
+import CustomTitleBar from "../components/custom/controller";
 import { cookies } from "next/dist/server/request/cookies";
 import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/animate-ui/components/radix/sidebar";
-import { AppSidebar } from "./components/app_sidebar";
+import { AppSidebar } from "../components/custom/app_sidebar";
 import { AnimeMediaProvider } from "@/contexts/anime_context";
+import { AuthProvider } from "@/contexts/auth_context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,7 +41,7 @@ export default async function RootLayout({
             <main>
               <CustomTitleBar />
               <AppSidebar />
-              {children}
+              <AuthProvider>{children}</AuthProvider>
             </main>
           </SidebarProvider>
         </AnimeMediaProvider>

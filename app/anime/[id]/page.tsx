@@ -1,10 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import CharacterItem from "@/app/components/character_item";
-import ImagePreview from "@/app/components/image_preview";
-import RelationItem from "@/app/components/relation_item";
+import CharacterItem from "@/components/custom/character_item";
+import CustomDialog from "@/components/custom/dialog/custom_dialog";
+import ImagePreview from "@/components/custom/dialog/image_preview";
+import RelationItem from "@/components/custom/relation_item";
+import { useAuth } from "@/contexts/auth_context";
 import { fetchOneAnimeData } from "@/Service/fetch_data";
+import { ShipWheel } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -19,6 +22,9 @@ export default function AnimePage() {
 
   const param = useParams();
   const animeId = Number(param.id);
+
+  const user = useAuth();
+  const [open, setOpen] = useState(false);
 
   const handleFetch = async () => {
     setLoading(true);
@@ -45,8 +51,8 @@ export default function AnimePage() {
   // Loading state
   if (loading) {
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-gray-950">
-        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      <div className="w-screen h-screen flex items-center justify-center bg-gray-950">
+        <ShipWheel size={50} className="animate-spin text-white!" />
       </div>
     );
   }
@@ -122,26 +128,63 @@ export default function AnimePage() {
                   </svg>
                   Watch Now
                 </button>
-                <button
-                  onClick={() => setIsInList(!isInList)}
-                  className={`flex items-center gap-2 px-6 py-2 rounded-lg transition-colors ${
-                    isInList
-                      ? "bg-green-600 hover:bg-green-700"
-                      : "bg-gray-800 hover:bg-gray-700"
-                  }`}
+                <CustomDialog
+                  title="Nope Sign in First"
+                  description="You have to sign in (its just with google ) to continue"
+                  open={open}
+                  onOpenChange={user ? () => {} : setOpen}
                 >
-                  {isInList ? (
+                  <button
+                    onClick={() => (user ? setIsInList(!isInList) : null)}
+                    className={`flex items-center gap-2 px-6 py-2 rounded-lg transition-colors ${
+                      isInList
+                        ? "bg-green-600 hover:bg-green-700"
+                        : "bg-gray-800 hover:bg-gray-700"
+                    }`}
+                  >
+                    {isInList ? (
+                      <svg
+                        className="w-4 h-4"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z" />
+                      </svg>
+                    ) : (
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                    )}
+                    {isInList ? "In List" : "Add to List"}
+                  </button>
+                </CustomDialog>
+                <CustomDialog
+                  title="Nope Sign in First"
+                  description="You have to sign in (its just with google ) to continue"
+                  open={open}
+                  onOpenChange={user ? () => {} : setOpen}
+                >
+                  <button
+                    onClick={() => (user ? setIsFavorite(!isFavorite) : null)}
+                    className={`p-2 rounded-lg transition-colors ${
+                      isFavorite
+                        ? "bg-red-600 hover:bg-red-700"
+                        : "bg-gray-800 hover:bg-gray-700"
+                    }`}
+                  >
                     <svg
-                      className="w-4 h-4"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z" />
-                    </svg>
-                  ) : (
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
+                      className="w-5 h-5"
+                      fill={isFavorite ? "currentColor" : "none"}
                       stroke="currentColor"
                       viewBox="0 0 24 24"
                     >
@@ -149,34 +192,11 @@ export default function AnimePage() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M12 4v16m8-8H4"
+                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                       />
                     </svg>
-                  )}
-                  {isInList ? "In List" : "Add to List"}
-                </button>
-                <button
-                  onClick={() => setIsFavorite(!isFavorite)}
-                  className={`p-2 rounded-lg transition-colors ${
-                    isFavorite
-                      ? "bg-red-600 hover:bg-red-700"
-                      : "bg-gray-800 hover:bg-gray-700"
-                  }`}
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill={isFavorite ? "currentColor" : "none"}
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                    />
-                  </svg>
-                </button>
+                  </button>
+                </CustomDialog>
               </div>
             </div>
             {/* Stats */}

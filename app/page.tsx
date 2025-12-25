@@ -1,8 +1,9 @@
 "use client";
+
+import AnimeItem from "@/components/custom/anime_Item";
+import { useAnimeMedia } from "@/contexts/anime_context";
 import { ShipWheel } from "lucide-react";
 import { useEffect } from "react";
-import AnimeItem from "./components/anime_Item";
-import { useAnimeMedia } from "@/contexts/anime_context";
 
 export default function Home() {
   const { items, loading, loadItems } = useAnimeMedia();
@@ -21,7 +22,7 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="w-full h-full flex items-center justify-center">
+      <div className="w-screen h-screen flex items-center justify-center">
         <ShipWheel size={50} className="animate-spin" />
       </div>
     );
