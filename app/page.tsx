@@ -1,21 +1,17 @@
 "use client";
 import { ShipWheel } from "lucide-react";
-import { useEffect, useState } from "react";
-import AnimeItem from "../components/custom/anime_Item";
+import { useEffect } from "react";
+import AnimeItem from "./components/anime_Item";
 import { useAnimeMedia } from "@/contexts/anime_context";
 
 export default function Home() {
-  const [loading, setLoading] = useState(false);
-  const { items, loadItems } = useAnimeMedia();
+  const { items, loading, loadItems } = useAnimeMedia();
 
   const getAnimeList = async () => {
-    setLoading(true);
     try {
       loadItems();
     } catch (error) {
       console.log("error in the main is" + error);
-    } finally {
-      setLoading(false);
     }
   };
 

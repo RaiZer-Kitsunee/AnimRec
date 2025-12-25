@@ -1,6 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 "use client";
-import CharacterItem from "@/components/custom/character_item";
-import RelationItem from "@/components/custom/relation_item";
+import CharacterItem from "@/app/components/character_item";
+import ImagePreview from "@/app/components/image_preview";
+import RelationItem from "@/app/components/relation_item";
 import { fetchOneAnimeData } from "@/Service/fetch_data";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -89,13 +92,15 @@ export default function AnimePage() {
         <div className="relative max-w-7xl mx-auto px-6 h-full flex items-end pb-8">
           <div className="flex items-center gap-6 w-full">
             {/* Cover Image */}
-            <div className="relative shrink-0 transform translate-y-12">
-              <img
-                src={fetchedAnime?.coverImage.extraLarge}
-                alt={fetchedAnime.title.english || fetchedAnime.title.romaji}
-                className="w-48 h-72 object-cover rounded-lg shadow-2xl"
-              />
-            </div>
+            <ImagePreview url={fetchedAnime?.coverImage.extraLarge}>
+              <div className="relative shrink-0 transform translate-y-12 cursor-pointer">
+                <img
+                  src={fetchedAnime?.coverImage.extraLarge}
+                  alt={fetchedAnime.title.english || fetchedAnime.title.romaji}
+                  className="w-48 h-72 object-cover rounded-lg shadow-2xl"
+                />
+              </div>
+            </ImagePreview>
 
             {/* Title and Actions */}
             <div className="grow pb-4">

@@ -27,7 +27,7 @@ const QUERY_SORT = (
     | "START_DATE_DESC"
     | "SCORE_DESC"
 ) => {
-  return `query { Page(perPage: 50) { media(type: ANIME, sort: ${sortMethod}) ${STATIC_DATA} }`;
+  return `query { Page(perPage: 49) { media(type: ANIME, sort: ${sortMethod}) ${STATIC_DATA} }`;
 };
 
 const QUERY_RECOMMENDATION = `query ($id: Int) { Media(id: $id, type: ANIME) { id title { romaji english native } 
