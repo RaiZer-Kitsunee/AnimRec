@@ -20,7 +20,7 @@ export default function Home() {
     getAnimeList();
   }, []);
 
-  if (loading) {
+  if (loading || items.length === 0) {
     return (
       <div className="w-screen h-screen flex items-center justify-center">
         <ShipWheel size={50} className="animate-spin" />

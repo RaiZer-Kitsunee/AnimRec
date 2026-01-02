@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @next/next/no-img-element */
 "use client";
@@ -5,6 +6,7 @@ import CharacterItem from "@/components/custom/character_item";
 import CustomDialog from "@/components/custom/dialog/custom_dialog";
 import ImagePreview from "@/components/custom/dialog/image_preview";
 import RelationItem from "@/components/custom/relation_item";
+import { useAnimeMedia } from "@/contexts/anime_context";
 import { useAuth } from "@/contexts/auth_context";
 import { fetchOneAnimeData } from "@/Service/fetch_data";
 import { ShipWheel } from "lucide-react";
@@ -24,6 +26,7 @@ export default function AnimePage() {
   const animeId = Number(param.id);
 
   const user = useAuth();
+  const { favorites, addFavorite, removeFavorite } = useAnimeMedia();
   const [open, setOpen] = useState(false);
 
   const handleFetch = async () => {
@@ -42,11 +45,20 @@ export default function AnimePage() {
     }
   };
 
+  const ToggleFavorite = async () => {
+    const isFav = await favorites.some((item) => item.id === animeId);
+    console.log("is fav" + isFav);
+    console.log(favorites);
+    console.log("fet id" + animeId);
+    setIsFavorite(isFav);
+  };
+
   useEffect(() => {
     if (animeId) {
       handleFetch();
+      ToggleFavorite();
     }
-  }, [animeId]);
+  }, [animeId, favorites]);
 
   // Loading state
   if (loading) {
@@ -175,7 +187,14 @@ export default function AnimePage() {
                   onOpenChange={user ? () => {} : setOpen}
                 >
                   <button
-                    onClick={() => (user ? setIsFavorite(!isFavorite) : null)}
+                    onClick={() => {
+                      user ? setIsFavorite(!isFavorite) : null;
+                      user
+                        ? !isFavorite
+                          ? addFavorite(fetchedAnime)
+                          : removeFavorite(fetchedAnime.id)
+                        : null;
+                    }}
                     className={`p-2 rounded-lg transition-colors ${
                       isFavorite
                         ? "bg-red-600 hover:bg-red-700"
@@ -293,8 +312,7 @@ export default function AnimePage() {
                         rel.relationType === "ALTERNATIVE" ? (
                           <></>
                         ) : (
-                          (console.log("relations" + rel.relationType),
-                          RelationItem({ idx, rel }))
+                          RelationItem({ idx, rel })
                         )
                       )}
                     </div>

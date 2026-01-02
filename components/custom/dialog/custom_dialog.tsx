@@ -4,6 +4,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { AlertTriangle } from "lucide-react";
 
 type CustomDialogType = {
   title: string;
@@ -41,12 +42,12 @@ export default function CustomDialog({
           "
         >
           {/* Header */}
-          <div className="mb-4">
-            <Dialog.Title className="text-lg font-semibold">
-              {title}
+          <div className="mb-4 flex flex-col gap-2">
+            <Dialog.Title className="text-lg font-semibold flex gap-2">
+              <AlertTriangle /> {title}
             </Dialog.Title>
             {description && (
-              <Dialog.Description className="text-sm text-gray-500">
+              <Dialog.Description className="text-sm text-gray-600">
                 {description}
               </Dialog.Description>
             )}
@@ -56,10 +57,12 @@ export default function CustomDialog({
           {showCloseButton && (
             <div className="flex gap-5 justify-end">
               <Link href={"/auth"}>
-                <Button>Sign In</Button>
+                <Button className="cursor-pointer">Sign In</Button>
               </Link>
               <Dialog.Close asChild>
-                <Button variant="ghost">Close</Button>
+                <Button className="cursor-pointer" variant="ghost">
+                  Close
+                </Button>
               </Dialog.Close>
             </div>
           )}

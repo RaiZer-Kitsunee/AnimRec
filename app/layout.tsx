@@ -36,15 +36,17 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-y-hidden`}
       >
-        <AnimeMediaProvider>
-          <SidebarProvider>
-            <main>
-              <CustomTitleBar />
-              <AppSidebar />
-              <AuthProvider>{children}</AuthProvider>
-            </main>
-          </SidebarProvider>
-        </AnimeMediaProvider>
+        <AuthProvider>
+          <AnimeMediaProvider>
+            <SidebarProvider>
+              <main>
+                <CustomTitleBar />
+                <AppSidebar />
+                {children}
+              </main>
+            </SidebarProvider>
+          </AnimeMediaProvider>
+        </AuthProvider>
       </body>
     </html>
   );
