@@ -8,11 +8,16 @@ import {
   SidebarMenuItem,
 } from "@/components/animate-ui/components/radix/sidebar";
 
-import { Home, Search, Settings } from "lucide-react";
+import { Home, Search, UserRound } from "lucide-react";
 import Link from "next/link";
 
 // Menu items.
 const items = [
+  {
+    title: "Settings",
+    url: "/settings",
+    icon: UserRound,
+  },
   {
     title: "Home",
     url: "/",
@@ -22,11 +27,6 @@ const items = [
     title: "Search",
     url: "/search",
     icon: Search,
-  },
-  {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
   },
 ];
 
@@ -41,7 +41,7 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild className="z-11 ">
                     <Link href={item.url}>
-                      <item.icon className="size-5! text-white" />
+                      <item.icon className="size-6! text-black bg-white border rounded-2xl" />
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

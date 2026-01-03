@@ -26,7 +26,14 @@ export default function AnimePage() {
   const animeId = Number(param.id);
 
   const user = useAuth();
-  const { favorites, addFavorite, removeFavorite } = useAnimeMedia();
+  const {
+    favorites,
+    addFavorite,
+    removeFavorite,
+    wishlists,
+    addWishlist,
+    removeWishlist,
+  } = useAnimeMedia();
   const [open, setOpen] = useState(false);
 
   const handleFetch = async () => {
@@ -45,20 +52,26 @@ export default function AnimePage() {
     }
   };
 
-  const ToggleFavorite = async () => {
+  const ToggleAutoFavorite = async () => {
     const isFav = await favorites.some((item) => item.id === animeId);
-    console.log("is fav" + isFav);
     console.log(favorites);
-    console.log("fet id" + animeId);
     setIsFavorite(isFav);
   };
 
+  const ToggleAutoWishlist = async () => {
+    const isWish = await wishlists.some((item) => item.id === animeId);
+    setIsInList(isWish);
+  };
+
   useEffect(() => {
-    if (animeId) {
+    if (animeId ) {
       handleFetch();
-      ToggleFavorite();
     }
-  }, [animeId, favorites]);
+    if (user) {
+      ToggleAutoFavorite();
+      ToggleAutoWishlist();
+    }
+  }, [animeId, user,favorites, wishlists]);
 
   // Loading state
   if (loading) {
@@ -147,7 +160,14 @@ export default function AnimePage() {
                   onOpenChange={user ? () => {} : setOpen}
                 >
                   <button
-                    onClick={() => (user ? setIsInList(!isInList) : null)}
+                    onClick={() => {
+                      user ? setIsInList(!isInList) : null;
+                      user
+                        ? !isInList
+                          ? addWishlist(fetchedAnime)
+                          : removeWishlist(fetchedAnime.id)
+                        : null;
+                    }}
                     className={`flex items-center gap-2 px-6 py-2 rounded-lg transition-colors ${
                       isInList
                         ? "bg-green-600 hover:bg-green-700"

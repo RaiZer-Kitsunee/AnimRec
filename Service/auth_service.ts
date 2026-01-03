@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { auth, db } from "@/lib/firebase";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { doc, setDoc, Timestamp } from "firebase/firestore";
@@ -25,8 +26,25 @@ async function signInWithGoogle() {
 }
 
 // sign out
-function logout() {
-  signOut(auth);
-}
+const logout = async () => {
+  try {
+    const user = auth.currentUser;
+
+    await signOut(auth);
+
+    // Revoke Google access token if signed in with Google
+    if (user?.providerData.some((p) => p?.providerId === "google.com")) {
+      // This revokes the token on Google's side
+      await fetch(
+        "https://accounts.google.com/o/oauth2/revoke?token=" +
+          (user as any).accessToken
+      ); // accessToken is available right after login, but not always persisted
+    }
+
+    console.log("Signed out and Google access revoked");
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
 
 export { signInWithGoogle, logout };

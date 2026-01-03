@@ -3,8 +3,11 @@
 import { fetchSortedAnimeDataList } from "@/Service/fetch_data";
 import {
   AddAnimeToFavoriteDB,
+  AddAnimeToWishlistDB,
   DeleteAnimeFromUserFavoriteDB,
+  DeleteAnimeFromUserWishlistDB,
   GetAllUserFavoriteDB,
+  GetAllUserWishlistDB,
 } from "@/Service/firebase_store";
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { useAuth } from "./auth_context";
@@ -12,12 +15,17 @@ import { useAuth } from "./auth_context";
 type MediaContextType = {
   items: Media[];
   favorites: Media[];
+  wishlists: Media[];
   loadItems: () => Promise<Media[]>;
   setItems: React.Dispatch<React.SetStateAction<Media[]>>;
   addFavorite: (item: Media) => void;
   removeFavorite: (itemId: number | string) => void;
   loadFavorite: () => Promise<Media[]>;
   setFavorites: React.Dispatch<React.SetStateAction<Media[]>>;
+  addWishlist: (item: Media) => void;
+  removeWishlist: (itemId: number | string) => void;
+  loadWishlist: () => Promise<Media[]>;
+  setWishlists: React.Dispatch<React.SetStateAction<Media[]>>;
   loading: boolean;
   error: string | null;
 };
@@ -29,6 +37,7 @@ const AnimeMediaContext = createContext<MediaContextType | undefined>(
 export function AnimeMediaProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<Media[]>([]);
   const [favorites, setFavorites] = useState<Media[]>([]);
+  const [wishlists, setWishlists] = useState<Media[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const user = useAuth();
@@ -66,23 +75,6 @@ export function AnimeMediaProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const loadItems = async (): Promise<Media[]> => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetchSortedAnimeDataList("TRENDING_DESC");
-      const data: Media[] = response.data; // replace with real source
-      setItems(data);
-      return data;
-    } catch (err) {
-      setError("Failed to load items");
-      return [];
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const loadFavorite = async (): Promise<Media[]> => {
     setLoading(true);
     setError(null);
@@ -95,7 +87,73 @@ export function AnimeMediaProvider({ children }: { children: ReactNode }) {
       setFavorites(data);
       return data;
     } catch (err) {
-      setError("Failed to load items");
+      setError("Failed to load items" + err);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addWishlist = async (item: Media) => {
+    try {
+      if (item) {
+        await AddAnimeToWishlistDB({
+          userId: user ? user?.uid : "no id",
+          animeMedia: item,
+        });
+      } else {
+        console.log("there is no item");
+      }
+    } catch (error) {
+      console.error("error " + error);
+    }
+  };
+
+  const removeWishlist = async (itemId: number | string) => {
+    try {
+      if (itemId) {
+        await DeleteAnimeFromUserWishlistDB({
+          userId: user ? user?.uid : "no id",
+          animeId: String(itemId),
+        });
+      } else {
+        console.log("deleted complete");
+      }
+    } catch (error) {
+      console.error("error: " + error);
+    }
+  };
+
+  const loadWishlist = async (): Promise<Media[]> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await GetAllUserWishlistDB({
+        userId: user ? user.uid : "no id",
+      });
+      const data: Media[] = response.data;
+      setWishlists(data);
+      return data;
+    } catch (error) {
+      setError("Failed to load items" + error);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadItems = async (): Promise<Media[]> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetchSortedAnimeDataList("TRENDING_DESC");
+      const data: Media[] = response.data; // replace with real source
+      setItems(data);
+      return data;
+    } catch (err) {
+      setError("Failed to load items" + err);
       return [];
     } finally {
       setLoading(false);
@@ -113,6 +171,11 @@ export function AnimeMediaProvider({ children }: { children: ReactNode }) {
         removeFavorite,
         loadFavorite,
         setFavorites,
+        wishlists,
+        addWishlist,
+        removeWishlist,
+        loadWishlist,
+        setWishlists,
         loading,
         error,
       }}
