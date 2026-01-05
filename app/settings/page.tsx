@@ -50,8 +50,8 @@ export default function SettingPage() {
   }
 
   return (
-    <div className="w-screen h-screen flex flex-col gap-5 bg-gray-950 pt-10 pb-5 pl-14 pr-5 overflow-y-scroll">
-      <div className="w-full h-full flex flex-col gap-5 ">
+    <div className="w-screen h-screen flex flex-col justify-start gap-5 bg-gray-950 pt-10 pb-5 pl-14 pr-5 overflow-y-scroll">
+      <div className="w-full flex flex-col gap-5 ">
         {user && (
           <div className="flex items-center justify-between bg-white gap-5 border-2 border-gray-500 rounded-2xl p-5">
             <div className="flex gap-4">

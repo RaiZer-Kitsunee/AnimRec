@@ -1,6 +1,10 @@
 "use client";
 
-import { fetchSortedAnimeDataList } from "@/Service/fetch_data";
+import {
+  fetchAnimeIdsData,
+  fetchGenresAnimeDataList,
+  fetchSortedAnimeDataList,
+} from "@/Service/fetch_data";
 import {
   AddAnimeToFavoriteDB,
   AddAnimeToWishlistDB,
@@ -11,21 +15,31 @@ import {
 } from "@/Service/firebase_store";
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { useAuth } from "./auth_context";
+import { number } from "motion/react";
 
 type MediaContextType = {
   items: Media[];
-  favorites: Media[];
-  wishlists: Media[];
   loadItems: () => Promise<Media[]>;
   setItems: React.Dispatch<React.SetStateAction<Media[]>>;
+  favorites: Media[];
   addFavorite: (item: Media) => void;
   removeFavorite: (itemId: number | string) => void;
   loadFavorite: () => Promise<Media[]>;
   setFavorites: React.Dispatch<React.SetStateAction<Media[]>>;
+  wishlists: Media[];
   addWishlist: (item: Media) => void;
   removeWishlist: (itemId: number | string) => void;
   loadWishlist: () => Promise<Media[]>;
   setWishlists: React.Dispatch<React.SetStateAction<Media[]>>;
+  filters: Media[];
+  loadFilters: ({
+    year,
+    genre,
+  }: {
+    year: number;
+    genre: string;
+  }) => Promise<Media[]>;
+  setFilters: React.Dispatch<React.SetStateAction<Media[]>>;
   loading: boolean;
   error: string | null;
 };
@@ -38,6 +52,7 @@ export function AnimeMediaProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<Media[]>([]);
   const [favorites, setFavorites] = useState<Media[]>([]);
   const [wishlists, setWishlists] = useState<Media[]>([]);
+  const [filters, setFilters] = useState<Media[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const user = useAuth();
@@ -48,7 +63,8 @@ export function AnimeMediaProvider({ children }: { children: ReactNode }) {
         console.log("user id" + user?.uid);
         await AddAnimeToFavoriteDB({
           userId: user ? user.uid : "there is no user",
-          animeMedia: item,
+          animeId: String(item.id),
+          animeName: item.title.english || "Null",
         });
         console.log("add complete");
       } else {
@@ -80,9 +96,11 @@ export function AnimeMediaProvider({ children }: { children: ReactNode }) {
     setError(null);
 
     try {
-      const response = await GetAllUserFavoriteDB({
+      const res = await GetAllUserFavoriteDB({
         userId: user?.uid || "there is no id",
       });
+      const animeList = res.data.map((item: { id: number }) => item.id);
+      const response = await fetchAnimeIdsData({ anime_ids: animeList });
       const data: Media[] = response.data; // replace with real source
       setFavorites(data);
       return data;
@@ -99,7 +117,8 @@ export function AnimeMediaProvider({ children }: { children: ReactNode }) {
       if (item) {
         await AddAnimeToWishlistDB({
           userId: user ? user?.uid : "no id",
-          animeMedia: item,
+          animeId: String(item.id),
+          animeName: item.title.english || "Null",
         });
       } else {
         console.log("there is no item");
@@ -129,11 +148,36 @@ export function AnimeMediaProvider({ children }: { children: ReactNode }) {
     setError(null);
 
     try {
-      const response = await GetAllUserWishlistDB({
+      const res = await GetAllUserWishlistDB({
         userId: user ? user.uid : "no id",
       });
+      const animeList = res.data.map((item: { id: number }) => item.id);
+      const response = await fetchAnimeIdsData({ anime_ids: animeList });
       const data: Media[] = response.data;
       setWishlists(data);
+      return data;
+    } catch (error) {
+      setError("Failed to load items" + error);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadFilters = async ({
+    year,
+    genre,
+  }: {
+    year: number;
+    genre: string;
+  }): Promise<Media[]> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetchGenresAnimeDataList({ year, genre });
+      const data: Media[] = response.data;
+      setFilters(data);
       return data;
     } catch (error) {
       setError("Failed to load items" + error);
@@ -176,6 +220,9 @@ export function AnimeMediaProvider({ children }: { children: ReactNode }) {
         removeWishlist,
         loadWishlist,
         setWishlists,
+        filters,
+        loadFilters,
+        setFilters,
         loading,
         error,
       }}

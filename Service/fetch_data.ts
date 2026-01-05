@@ -13,6 +13,9 @@ const STATIC_DATA = `{ id title { romaji english native } description source sea
 
 const QUERY = `query ($id: Int) { Media(id: $id, type: ANIME) ${STATIC_DATA} `;
 
+const QUERYmore =
+  "query ($ids: [Int]) {  Page {    media(id_in: $ids, type: ANIME) {      id      title {        romaji        english        native      }      description      source      season      seasonYear      genres      episodes      status      format      duration      averageScore      popularity      favourites      studios(isMain: true) {        nodes {          name          id        }      }      nextAiringEpisode {        airingAt        timeUntilAiring        episode      }      characters {        edges {          role          node {            id            name {              full            }            image {              large            }          }        }      }      relations {        edges {          relationType          node {            id            title {              romaji            }            coverImage {              extraLarge              large              medium            }            format          }        }      }      coverImage {        extraLarge        large        medium      }      bannerImage    }  }}";
+
 const QUERY_ALL = `query ($page: Int, $perPage: Int) { Page(page: $page, perPage: $perPage) { media(type: ANIME) ${STATIC_DATA} }`;
 
 const QUERY_SEARCH = `query ($search: String) { Page(perPage: 20) { media(search: $search, type: ANIME) ${STATIC_DATA} }`;
@@ -63,6 +66,36 @@ async function fetchOneAnimeData({
     const data = await res.json();
 
     return TASK_COMPLETE(data.data.Media);
+  } catch (error) {
+    if (error instanceof Error) return TASK_FAILED(error);
+  }
+  return UNKNOWN_ERROR;
+}
+
+async function fetchAnimeIdsData({
+  anime_ids,
+}: {
+  anime_ids: number[];
+}): Promise<CustomResponse> {
+  if (!anime_ids) return MISSING_REQUIREMENT;
+  try {
+    const res = await fetch("https://graphql.anilist.co", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        query: QUERYmore,
+        variables: {
+          ids: anime_ids,
+        },
+      }),
+    });
+
+    const data = await res.json();
+
+    return TASK_COMPLETE(data.data.Page.media);
   } catch (error) {
     if (error instanceof Error) return TASK_FAILED(error);
   }
@@ -256,6 +289,7 @@ async function fetchRelationsForAnimeDataList({ id }: { id: number }) {
 
 export {
   fetchOneAnimeData,
+  fetchAnimeIdsData,
   fetchAnimeDataList,
   fetchSearchAnimeDataList,
   fetchGenresAnimeDataList,

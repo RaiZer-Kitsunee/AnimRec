@@ -19,27 +19,29 @@ import {
 // add anime to favorite of the current user
 async function AddAnimeToFavoriteDB({
   userId,
-  animeMedia,
+  animeId,
+  animeName,
 }: {
   userId: string | undefined;
-  animeMedia: Media;
+  animeId: string;
+  animeName: string;
 }): Promise<CustomResponse> {
-  if (!userId || !animeMedia) return MISSING_REQUIREMENT;
+  if (!userId || !animeId || !animeName) return MISSING_REQUIREMENT;
 
   try {
     const userDoc = doc(collection(db, "users"), userId);
-    const favoriteDoc = doc(
-      collection(userDoc, "favorites"),
-      String(animeMedia.id)
-    );
+    const favoriteDoc = doc(collection(userDoc, "favorites"), animeId);
 
     if (favoriteDoc) {
       console.log("i found the favorite doc" + userId);
-      await setDoc(favoriteDoc, animeMedia);
+      await setDoc(favoriteDoc, {
+        id: animeId,
+        name: animeName,
+      });
       console.log("adn finish setting the fav anime");
     }
 
-    return TASK_COMPLETE(animeMedia);
+    return TASK_COMPLETE(animeName);
   } catch (error) {
     if (error instanceof Error) return TASK_FAILED(error);
   }
@@ -82,8 +84,7 @@ async function GetAllUserFavoriteDB({
     const querySnapshot = await getDocs(favoriteCol);
 
     const favorites = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
+      id: Number(doc.id),
     }));
 
     return TASK_COMPLETE(favorites);
@@ -98,22 +99,24 @@ async function GetAllUserFavoriteDB({
 // add anime to wishlist of the current user
 async function AddAnimeToWishlistDB({
   userId,
-  animeMedia,
+  animeId,
+  animeName,
 }: {
   userId: string;
-  animeMedia: Media;
+  animeId: string;
+  animeName: string;
 }): Promise<CustomResponse> {
-  if (!userId || !animeMedia) return MISSING_REQUIREMENT;
+  if (!userId || !animeId || !animeName) return MISSING_REQUIREMENT;
   try {
     const userDoc = doc(collection(db, "users"), userId);
-    const wishDoc = doc(
-      collection(userDoc, "wishlists"),
-      String(animeMedia.id)
-    );
+    const wishDoc = doc(collection(userDoc, "wishlists"), animeId);
 
-    await setDoc(wishDoc, animeMedia);
+    await setDoc(wishDoc, {
+      id: animeId,
+      name: animeName,
+    });
 
-    return TASK_COMPLETE(animeMedia);
+    return TASK_COMPLETE(animeId);
   } catch (error) {
     if (error instanceof Error) return TASK_FAILED(error);
   }
@@ -157,8 +160,7 @@ async function GetAllUserWishlistDB({
     const querySnapshot = await getDocs(wishCol);
 
     const wishlists = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
+      id: Number(doc.id),
     }));
 
     return TASK_COMPLETE(wishlists);

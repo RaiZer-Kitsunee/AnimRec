@@ -8,7 +8,7 @@ import {
   SidebarMenuItem,
 } from "@/components/animate-ui/components/radix/sidebar";
 
-import { Home, Search, UserRound } from "lucide-react";
+import { CalendarDays, Home, Search, UserRound } from "lucide-react";
 import Link from "next/link";
 
 // Menu items.
@@ -28,6 +28,11 @@ const items = [
     url: "/search",
     icon: Search,
   },
+  {
+    title: "Filter",
+    url: "/filter",
+    icon: CalendarDays,
+  },
 ];
 
 export function AppSidebar() {
@@ -39,7 +44,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className="z-11 ">
+                  <SidebarMenuButton asChild className="z-11 " >
                     <Link href={item.url}>
                       <item.icon className="size-6! text-black bg-white border rounded-2xl" />
                     </Link>
